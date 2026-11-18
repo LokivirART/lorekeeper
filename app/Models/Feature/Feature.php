@@ -6,6 +6,7 @@ use App\Models\Model;
 use App\Models\Rarity;
 use App\Models\Species\Species;
 use App\Models\Species\Subtype;
+use App\Models\User\User;
 use Illuminate\Support\Facades\DB;
 
 class Feature extends Model {
@@ -15,7 +16,7 @@ class Feature extends Model {
      * @var array
      */
     protected $fillable = [
-        'feature_category_id', 'species_id', 'subtype_id', 'rarity_id', 'name', 'has_image', 'description', 'parsed_description', 'is_visible', 'hash',
+        'feature_category_id', 'species_id', 'subtype_id', 'rarity_id', 'name', 'has_image', 'description', 'parsed_description', 'is_visible', 'hash', 'reference_url', 'artist_alias', 'artist_url', 'artist_id',
     ];
 
     /**
@@ -37,6 +38,7 @@ class Feature extends Model {
         'name'                => 'required|unique:features|between:3,100',
         'description'         => 'nullable',
         'image'               => 'mimes:png',
+        'reference_url'       => 'nullable|between:3,200',
     ];
 
     /**
@@ -52,6 +54,7 @@ class Feature extends Model {
         'name'                => 'required|between:3,100',
         'description'         => 'nullable',
         'image'               => 'mimes:png',
+        'reference_url'       => 'nullable|between:3,200',
     ];
 
     /**********************************************************************************************
@@ -86,6 +89,13 @@ class Feature extends Model {
      */
     public function category() {
         return $this->belongsTo(FeatureCategory::class, 'feature_category_id');
+    }
+
+    /**
+     * Get the user that drew the feature art.
+     */
+    public function artist() {
+        return $this->belongsTo(User::class, 'artist_id');
     }
 
     /**********************************************************************************************
@@ -288,6 +298,44 @@ class Feature extends Model {
      */
     public function getAdminPowerAttribute() {
         return 'edit_data';
+    }
+
+    /**
+     * Get the artist of the feature's image.
+     *
+     * @return string
+     */
+    public function getFeatureArtistAttribute() {
+        if (!$this->artist_url && !$this->artist_id) {
+            return null;
+        }
+
+        // Check to see if the artist exists on site
+        $artist = checkAlias($this->artist_url, false);
+        if (is_object($artist)) {
+            $this->artist_id = $artist->id;
+            $this->artist_url = null;
+            $this->save();
+        }
+
+        if ($this->artist_id) {
+            return $this->artist->displayName;
+        } elseif ($this->artist_url) {
+            return prettyProfileLink($this->artist_url);
+        }
+    }
+
+    /**
+     * Get the reference url attribute.
+     *
+     * @return string
+     */
+    public function getReferenceAttribute() {
+        if (!$this->reference_url) {
+            return null;
+        }
+
+        return $this->reference_url;
     }
 
     /**********************************************************************************************

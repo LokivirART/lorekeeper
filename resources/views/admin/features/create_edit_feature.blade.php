@@ -67,6 +67,25 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md form-group">
+            {!! Form::label('Reference Link (Optional)') !!} {!! add_help('An optional link to an additional reference') !!}
+            {!! Form::text('reference_url', $feature->reference_url, ['class' => 'form-control']) !!}
+        </div>
+        <div class="col-md">
+            {!! Form::label('Trait Artist (Optional)') !!} {!! add_help('Provide the artist\'s username if they are on site or, failing that, a link.') !!}
+            <div class="row">
+                <div class="col-md form-group">
+                    {!! Form::select('artist_id', $userOptions, $feature && $feature->artist_id ? $feature->artist_id : null, ['class' => 'form-control mr-2 selectize', 'placeholder' => 'Select a User']) !!}
+                </div>
+                <div class="col-md form-group">
+                    {!! Form::text('artist_url', $feature && $feature->artist_url ? $feature->artist_url : '', ['class' => 'form-control mr-2', 'placeholder' => 'Artist URL']) !!}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="form-group">
         {!! Form::label('Description (Optional)') !!}
         {!! Form::textarea('description', $feature->description, ['class' => 'form-control wysiwyg']) !!}

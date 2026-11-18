@@ -30,6 +30,17 @@
                 @endif
             </div>
         @endif
+        @if (isset($feature->reference) && $feature->reference)
+            <div>
+                <strong>Reference Link:</strong>
+                <a href="{{ $feature->reference }}">
+                    {{ $feature->reference }}
+                </a>
+            </div>
+        @endif
+        @if (isset($feature->featureArtist) && $feature->featureArtist)
+            <div><strong>Artist:</strong> {!! $feature->featureArtist !!}</div>
+        @endif
         <div class="world-entry-text parsed-text">
             {!! $feature->parsed_description !!}
         </div>
